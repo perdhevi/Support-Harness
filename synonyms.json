@@ -1,0 +1,20 @@
+[
+  ["setup", "setting", "set"],
+  ["enforce", "enforcing", "enforced", "enforcement"],
+  ["configure", "configuring", "configuration", "config"],
+  ["authenticate", "authentication", "auth"],
+  ["invite", "inviting", "invitation"],
+  ["generate", "generating", "generation"],
+  ["rotate", "rotating", "rotation"],
+  ["delete", "deleting", "deletion"],
+  ["remove", "removing", "removal"],
+  ["fail", "failed", "failing", "failure", "failures"],
+  ["pay", "payment", "payments"],
+  ["upgrade", "upgrading"],
+  ["downgrade", "downgrading"],
+  ["cancel", "cancelling", "cancellation"],
+  ["refund", "refunds", "refunding"],
+  ["notify", "notification", "notifications"],
+  ["connect", "connecting", "connection"],
+  ["error", "errors"]
+]

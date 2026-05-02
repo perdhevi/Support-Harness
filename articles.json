@@ -1,0 +1,135 @@
+[
+  {
+    "id": "kb-001",
+    "title": "How to reset your password",
+    "product": "portal",
+    "is_internal": false,
+    "content": "To reset your password:\n1. Click 'Forgot Password' on the login page.\n2. Enter your registered email address.\n3. Check your inbox for a reset link (valid for 24 hours).\n4. Click the link and enter a new password.\n\nIf you don't receive the email within 5 minutes, check your spam folder. The reset link expires after 24 hours — if it has expired, repeat the process. If the issue persists, contact support."
+  },
+  {
+    "id": "kb-002",
+    "title": "API rate limits — Pro and Enterprise plans",
+    "product": "api",
+    "is_internal": false,
+    "content": "Rate limits by plan:\n\n  Free plan:       100 requests / minute\n  Pro plan:        1,000 requests / minute\n  Enterprise plan: 10,000 requests / minute\n\nWhen you exceed the limit, the API returns HTTP 429 with a Retry-After header indicating how many seconds to wait. Implement exponential back-off and always respect the Retry-After value. Burst allowances: up to 2x the per-minute limit for 10-second windows. Rate limit headers are included in every response: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset."
+  },
+  {
+    "id": "kb-003",
+    "title": "Billing cycle and invoice generation",
+    "product": "billing",
+    "is_internal": false,
+    "content": "Invoices are generated on the 1st of each month for the previous billing period. You will receive an email notification with a PDF attachment. To view past invoices, navigate to Settings → Billing → Invoice History. Payment is due within 14 days of the invoice date. Failed payments trigger a retry after 3 days, then 7 days. After two failed retries your account is suspended until payment is resolved."
+  },
+  {
+    "id": "kb-004",
+    "title": "SSO configuration guide (SAML 2.0)",
+    "product": "portal",
+    "is_internal": false,
+    "content": "To configure Single Sign-On (SSO) using SAML 2.0:\n1. Go to Settings → Security → Single Sign-On.\n2. Download the SP metadata XML.\n3. Upload it to your Identity Provider (Okta, Azure AD, Google Workspace, etc.).\n4. Copy the IdP SSO URL and certificate back into the SSO settings page.\n5. Map the email attribute — the NameID format must be email address.\n6. Test the integration with a non-admin account before enforcing SSO for all users.\n7. Enable 'Enforce SSO' only after a successful test.\n\nSupported bindings: HTTP-POST. If users cannot log in after enabling SSO, verify the certificate has not expired in your IdP."
+  },
+  {
+    "id": "kb-005",
+    "title": "[INTERNAL] Escalation runbook — repeated login failures",
+    "product": "portal",
+    "is_internal": true,
+    "content": "AGENTS ONLY — do not share with customers.\n\nIf a customer reports more than 5 failed login attempts:\n1. Check auth service logs in Datadog (filter: user_id + 'AUTH_FAIL').\n2. Verify the account is not soft-locked: Admin Console → Users → Status.\n3. If locked, unlock manually and trigger a password reset email.\n4. If the customer has lost their MFA device, initiate MFA reset flow (requires manager approval via Jira ticket).\n5. If auth service logs show ERR_TOKEN_CORRUPT, escalate immediately to Tier 2 — do not attempt manual fix.\n6. Document all actions in the support ticket before closing."
+  },
+  {
+    "id": "kb-006",
+    "title": "Webhook delivery failures and retry policy",
+    "product": "api",
+    "is_internal": false,
+    "content": "Webhooks are retried up to 5 times using exponential back-off: 1 min, 5 min, 30 min, 2 hr, 8 hr. A delivery attempt is considered failed if your endpoint returns a non-2xx HTTP response or does not respond within 10 seconds.\n\nTo inspect failed deliveries: Dashboard → Webhooks → Delivery Log. Each entry shows the request payload, response status, and response body. You can manually replay any failed delivery within 72 hours of the original event.\n\nBest practices: respond with HTTP 200 immediately, then process the payload asynchronously. Use the event ID in the payload to deduplicate retried deliveries."
+  },
+  {
+    "id": "kb-007",
+    "title": "Setting up two-factor authentication (2FA)",
+    "product": "portal",
+    "is_internal": false,
+    "content": "Two-factor authentication (2FA) adds a second layer of security to your account.\n\nTo enable 2FA:\n1. Go to Settings → Security → Two-Factor Authentication.\n2. Choose your method: Authenticator App (recommended) or SMS.\n3. For Authenticator App: scan the QR code with Google Authenticator, Authy, or any TOTP-compatible app.\n4. Enter the 6-digit code to confirm setup.\n5. Save your backup codes in a secure location — these are shown once only.\n\nTo disable 2FA, go to Settings → Security → Two-Factor Authentication → Remove. Note: organisation admins can enforce 2FA for all members. If 2FA is enforced, individual users cannot disable it."
+  },
+  {
+    "id": "kb-008",
+    "title": "Inviting team members and managing roles",
+    "product": "portal",
+    "is_internal": false,
+    "content": "To invite a new team member:\n1. Go to Settings → Team → Members.\n2. Click 'Invite Member' and enter their email address.\n3. Assign a role: Viewer, Editor, or Admin.\n4. Click Send Invitation.\n\nThe invite expires after 7 days. Uninvited users can be re-invited at any time.\n\nRole permissions:\n  Viewer  — read-only access to all resources\n  Editor  — can create and edit resources, cannot manage billing or members\n  Admin   — full access including billing, member management, and SSO settings\n\nTo change a member's role, go to Settings → Team → Members, click the member, and select a new role. Role changes take effect immediately."
+  },
+  {
+    "id": "kb-009",
+    "title": "[INTERNAL] Account deletion and data purge process",
+    "product": "portal",
+    "is_internal": true,
+    "content": "AGENTS ONLY — do not share with customers.\n\nWhen a customer requests account deletion:\n1. Verify identity: the request must come from the account owner (primary admin email on file).\n2. Check for active subscriptions: if a paid plan is active, process a pro-rated refund before deletion.\n3. Issue a 14-day cancellation notice email (template: ACCT_DELETE_NOTICE).\n4. After 14 days, trigger deletion via Admin Console → Accounts → [Account] → Initiate Deletion.\n5. Data is soft-deleted immediately and permanently purged after 30 days.\n6. Send confirmation email to customer after soft-delete (template: ACCT_DELETE_CONFIRM).\n7. Log the deletion in the compliance tracker spreadsheet (link in internal wiki).\n\nData subject requests under GDPR/CCPA follow the same process but with a 72-hour SLA on initial response."
+  },
+  {
+    "id": "kb-010",
+    "title": "API authentication — generating and rotating API keys",
+    "product": "api",
+    "is_internal": false,
+    "content": "API keys are used to authenticate requests to the API. Each key is tied to a single user account and inherits that user's permissions.\n\nTo generate an API key:\n1. Go to Settings → Developer → API Keys.\n2. Click 'New API Key', give it a descriptive name, and click Generate.\n3. Copy the key immediately — it is shown only once.\n\nTo rotate a key (recommended every 90 days):\n1. Generate a new key.\n2. Update your application to use the new key.\n3. Verify the new key is working.\n4. Delete the old key from Settings → Developer → API Keys.\n\nKeep keys secret. Do not commit them to source control. Use environment variables or a secrets manager. If a key is compromised, delete it immediately and generate a replacement."
+  },
+  {
+    "id": "kb-011",
+    "title": "Common API error codes and how to resolve them",
+    "product": "api",
+    "is_internal": false,
+    "content": "HTTP 400 Bad Request: the request body is malformed or missing required fields. Check the error message in the response body for the specific field.\n\nHTTP 401 Unauthorized: the API key is missing, invalid, or has been deleted. Verify the Authorization header format: 'Bearer YOUR_API_KEY'.\n\nHTTP 403 Forbidden: the API key is valid but does not have permission for this resource. Check the key's associated user role.\n\nHTTP 404 Not Found: the resource ID does not exist or has been deleted.\n\nHTTP 422 Unprocessable Entity: the request is well-formed but fails validation (e.g. invalid enum value, date in the past). See the errors array in the response.\n\nHTTP 429 Too Many Requests: rate limit exceeded. Wait for the duration specified in the Retry-After header.\n\nHTTP 500 Internal Server Error: server-side issue. Retry after a short delay. If the error persists, contact support with the request ID from the response header X-Request-ID."
+  },
+  {
+    "id": "kb-012",
+    "title": "[INTERNAL] API abuse detection and key suspension",
+    "product": "api",
+    "is_internal": true,
+    "content": "AGENTS ONLY — do not share with customers.\n\nThe abuse detection system automatically flags API keys that exceed normal usage patterns. Flagged keys are reviewed before suspension.\n\nTriggering conditions (any one is sufficient):\n  - Sustained usage > 5x plan rate limit for > 10 minutes\n  - Requests originating from > 50 unique IPs in a 1-hour window\n  - Error rate > 80% (may indicate credential stuffing or scanning)\n  - Requests to deprecated or non-existent endpoints in bulk\n\nTo review a flagged key: Admin Console → API → Flagged Keys. Each entry includes usage graphs and sample request logs.\n\nSuspension process:\n1. Notify the account owner via email (template: API_ABUSE_WARNING) — 24-hour grace period.\n2. If pattern continues, suspend key and notify again (template: API_KEY_SUSPENDED).\n3. For clear malicious activity, suspend immediately and escalate to the security team."
+  },
+  {
+    "id": "kb-013",
+    "title": "How to update your payment method",
+    "product": "billing",
+    "is_internal": false,
+    "content": "To update the payment method on your account:\n1. Go to Settings → Billing → Payment Methods.\n2. Click 'Add Payment Method'.\n3. Enter your new card details and click Save.\n4. Set the new card as the default by clicking 'Make Default'.\n5. Optionally, remove the old card.\n\nAccepted payment methods: Visa, Mastercard, American Express, Discover. We do not accept prepaid or virtual cards.\n\nIf a payment has recently failed, updating the card does not automatically retry the payment. To retry a failed payment, go to Settings → Billing → Invoice History, find the failed invoice, and click 'Retry Payment'.\n\nFor invoiced customers (Enterprise plan), contact your account manager to update payment details."
+  },
+  {
+    "id": "kb-014",
+    "title": "Upgrading or downgrading your subscription plan",
+    "product": "billing",
+    "is_internal": false,
+    "content": "To change your subscription plan:\n1. Go to Settings → Billing → Subscription.\n2. Click 'Change Plan'.\n3. Select your new plan and confirm.\n\nUpgrade: takes effect immediately. You are charged a pro-rated amount for the remainder of the current billing cycle.\n\nDowngrade: takes effect at the end of the current billing cycle. You retain access to higher-tier features until the cycle ends. If your current usage exceeds the limits of the new plan (e.g. number of team members or API keys), you will be prompted to reduce usage before the downgrade can proceed.\n\nCancellation: to cancel your subscription entirely, select the Free plan. Your data is retained for 90 days after downgrade to Free."
+  },
+  {
+    "id": "kb-015",
+    "title": "Refund policy and how to request a refund",
+    "product": "billing",
+    "is_internal": false,
+    "content": "Refund eligibility:\n  - Monthly plans: refunds are available within 7 days of a charge if you have not used the service during that period.\n  - Annual plans: a pro-rated refund is available within 30 days of the initial purchase.\n  - After these windows, charges are non-refundable.\n\nTo request a refund:\n1. Go to Settings → Billing → Invoice History.\n2. Find the invoice and click 'Request Refund'.\n3. Select a reason and submit.\n\nRefunds are processed within 5-10 business days and returned to the original payment method. If you paid by invoice, a credit note is issued.\n\nFor disputes or charges you do not recognise, contact support immediately."
+  },
+  {
+    "id": "kb-016",
+    "title": "Getting started with the mobile app",
+    "product": "mobile",
+    "is_internal": false,
+    "content": "The mobile app is available for iOS (14+) and Android (10+).\n\nTo get started:\n1. Download the app from the App Store or Google Play.\n2. Open the app and tap 'Sign In'.\n3. Enter your email and password, or use SSO if your organisation has it configured.\n4. If 2FA is enabled, enter your code when prompted.\n\nThe mobile app supports all core features: viewing and responding to items, receiving push notifications, and switching between workspaces.\n\nFeatures not available on mobile: admin settings, billing management, API key management, and SSO configuration. These require the web portal.\n\nTo enable push notifications, go to Profile → Notifications → Push Notifications and toggle the events you want to be notified about."
+  },
+  {
+    "id": "kb-017",
+    "title": "Managing push notification preferences",
+    "product": "mobile",
+    "is_internal": false,
+    "content": "Push notifications can be managed at two levels: account-level defaults and per-device settings.\n\nAccount-level (applies to all devices):\n  Go to Profile → Notifications → Push Notifications in the web portal or mobile app.\n  Toggle individual notification types on or off.\n\nPer-device:\n  On iOS: Settings → Notifications → [App Name] → allow or disallow.\n  On Android: Settings → Apps → [App Name] → Notifications.\n\nCommon notification types:\n  - New assignments\n  - Replies and comments\n  - Mentions (@username)\n  - Status changes\n  - Billing alerts\n\nIf you are not receiving notifications despite enabling them, check that Do Not Disturb is not active and that background app refresh is enabled for the app."
+  },
+  {
+    "id": "kb-018",
+    "title": "Connecting your Slack workspace",
+    "product": "integrations",
+    "is_internal": false,
+    "content": "To connect your Slack workspace:\n1. Go to Settings → Integrations → Slack.\n2. Click 'Connect to Slack' and authorise the app in your Slack workspace.\n3. Choose a default channel for notifications.\n4. Configure which events send Slack notifications: new items, status changes, mentions, etc.\n\nOnce connected, you can also use Slack slash commands:\n  /create [title]     — create a new item\n  /search [query]     — search for items\n  /status [item-id]   — get the status of an item\n\nTo disconnect, go to Settings → Integrations → Slack → Disconnect. This removes the app from your Slack workspace and stops all notifications. Your data is not affected."
+  },
+  {
+    "id": "kb-019",
+    "title": "Using Zapier to automate workflows",
+    "product": "integrations",
+    "is_internal": false,
+    "content": "Zapier integration allows you to connect to 5,000+ apps and automate workflows without writing code.\n\nTo set up a Zap:\n1. Go to Settings → Integrations → Zapier and copy your Zapier API key.\n2. In Zapier, create a new Zap and search for our app as the trigger or action.\n3. Paste your API key when prompted.\n4. Configure the trigger (e.g. 'New Item Created') and action (e.g. 'Create row in Google Sheets').\n5. Test and enable your Zap.\n\nAvailable triggers: New Item, Item Updated, Status Changed, New Comment.\nAvailable actions: Create Item, Update Item Status, Add Comment.\n\nNote: Zapier integration requires a Pro plan or higher. Free plan users can connect Zapier but Zaps will not run until the account is upgraded."
+  }
+]
